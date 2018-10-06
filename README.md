@@ -1,5 +1,5 @@
 # SEMB_PIC
-Projeto para disciplina de SEM na plataforma PIC
+Projeto para disciplina de SEMB na plataforma PIC
 
 Esse projeto vai se consistir de duas partes principais, uma feita no computador usando python e outra na plataforma embarcada 
 pic18f4520(talvez 18f4685) em C.
