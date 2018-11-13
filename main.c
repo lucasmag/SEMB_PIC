@@ -62,38 +62,27 @@ void ReceberImagem(void){
     char entrada[6];
     int valor;
     comunicacaoLED = 1;
-    UART_Escrever_Texto("POST");
-    //UART_Escrever_Texto("oi");
     /*while(strcmp(entrada,"FIN") != 0){
         UART_Ler_Texto(entrada);
         valor = atoi(entrada);
-        if(valor == 37){
-            UART_Escrever_Texto("Ola");
-        }
-        //UART_Escrever_Texto(entrada);
     }*/
-    //UART_Escrever_Texto("FIN");
     comunicacaoLED = 0;
 }
 
 void EnviarImagem(void){
     short i,j;
     comunicacaoLED = 1;
-    unsigned char p = 0;
     for(i = 0; i < imgALTURA; i++){
         for(j = 0; j < imgLARGURA; j++){
-            UART_Escrever_Pixel(p);
-            p++;
-            if(p > 255) p = 0;
+            UART_Escrever_Pixel(pixels[i][j]);
         }
     }
-    //UART_Escrever_Texto("FIN");
     comunicacaoLED = 0;
 }
 
 void RobertsCross(void){
     robertsLED = 1;
-    UART_Escrever_Texto("ROB");
+    
     robertsLED = 0;
 }
 
