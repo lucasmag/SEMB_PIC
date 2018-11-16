@@ -9,17 +9,17 @@
 #define	UART_H
 
 void UART_iniciar(){
-    ANSELCbits.ANSC7 = 0;
-    ANSELCbits.ANSC6 = 0;   // Disable Analog function of pin RC6/AN8
-    RC6PPS = 0x10; // MAKE PIN RC6 AS TX PIN -> see PIC16F18875 datasheet
-    RXPPSbits.RXPPS = 0x17; // MAKE PIN RC7 AS RX PIN -> see PIC16F18875 datasheet 
-    SPBRG = 51; //baud rate 9600
-    TX1STAbits.BRGH = 0;// Initialising BRGH and BRG16 register pair (BAUD RATE)
-    BAUDCON1bits.BRG16 = 0;// Initialising BRGH and BRG16 register pair (BAUD RATE)             
-    TX1STAbits.TXEN = 1;               // Enables Transmitter circuitry
-    TX1STAbits.SYNC = 0;// Clearing SYNC bit (TXxSTA reg)|Configures EUSART for asynchronous operation
-    RC1STAbits.SPEN = 1;               // Enables EUSART and configures TX/CK I/O pin as output
-    RC1STAbits.CREN = 1;    //habilita EUSART Rx
+    ANSELCbits.ANSC7 = 0;   //Desativa função analógica no pino RC7
+    ANSELCbits.ANSC6 = 0;   //Desativa função analógica no pino RC6
+    RC6PPS = 0x10;          //Configura pino RC6 como TX
+    RXPPSbits.RXPPS = 0x17; //Configura pino RC7 como RX
+    TX1STAbits.BRGH = 0;    //Necessário para configurar o baud rate da EUSART
+    BAUDCON1bits.BRG16 = 0; //Configura registrado BAUDCON1 como 8 bits
+    SPBRG = 51;             //Configura baud rate para 9600bps
+    RC1STAbits.SPEN = 1;    //Habilita EUSART
+    RC1STAbits.CREN = 1;    //Habilita recebimento EUSART (RX)
+    TX1STAbits.TXEN = 1;    //Habilita transmissão EUSART (TX)
+    TX1STAbits.SYNC = 0;    //Configura EUSART para modo assíncrono
 }
 
 char UART_Ler(){
