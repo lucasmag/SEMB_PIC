@@ -58,17 +58,6 @@ void ConfigurarPIC(void){
     TRISC = 0b10000000;
 }
 
-void ReceberImagem(void){
-    char entrada[6];
-    int valor;
-    comunicacaoLED = 1;
-    /*while(strcmp(entrada,"FIN") != 0){
-        UART_Ler_Texto(entrada);
-        valor = atoi(entrada);
-    }*/
-    comunicacaoLED = 0;
-}
-
 void EnviarImagem(void){
     short i,j;
     comunicacaoLED = 1;
@@ -80,9 +69,18 @@ void EnviarImagem(void){
     comunicacaoLED = 0;
 }
 
-void RobertsCross(void){
+void RobertsCrossSerial(void){
     robertsLED = 1;
-    
+    short i,j;
+    unsigned char novo_pixel;
+    for(i = 0; i < imgALTURA; i++){
+        for(j = 0; j < imgLARGURA; j++){
+            novo_pixel = RobertsCross(i,j);
+            comunicacaoLED = 1;
+            UART_Escrever_Pixel(novo_pixel);
+            comunicacaoLED = 0;
+        }
+    }
     robertsLED = 0;
 }
 
@@ -92,20 +90,15 @@ int main(void) {
     ConfigurarPIC();
     UART_iniciar();  
     LATA = 0x10;
-    //ZerarPixels();
     
     while (1) {
         UART_Ler_Texto(entrada);
-        if(strcmp(entrada,"POST") == 0){
-            ReceberImagem();
-        }
-        else if(strcmp(entrada,"GET") == 0){
+        if(strcmp(entrada,"GET") == 0){
             EnviarImagem();
         }
         else if(strcmp(entrada,"ROB") == 0){
-            RobertsCross();
+            RobertsCrossSerial();
         }
-        //UART_Escrever_Texto(entrada);
     }
     
     return EXIT_SUCCESS;
