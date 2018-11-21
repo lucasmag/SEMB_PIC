@@ -3,9 +3,9 @@
 
  *  Autores : Tiago Dionizio e Lucas Magalhães
 
- *  Copyright (C) 2018 Tiago Siqueira Dionizio <tiagosdionizio@gmail.com>
+ *  Copyright (C) 2018 Tiago Siqueira Dionizio  <tiagosdionizio@gmail.com>
 
- *  Copyright (C) 2018 Lucas Magalhães  <lucasmag97@gmail.com> 
+ *  Copyright (C) 2018 Lucas Magalhães de Sousa <lucasmag97@gmail.com> 
 
  *  Data de Atualização : 20 de Novembro de 2018
 */
