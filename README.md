@@ -1,27 +1,30 @@
-# SEMB_PIC
-Projeto para disciplina de SEMB na plataforma PIC
+# edge-detection-pic
+Projeto de Sistemas Embarcados na plataforma PIC, Engenharia da computação - 2018.2 | Instituto Federal do Ceará
 
-Esse projeto vai se consistir de duas partes principais, uma feita no computador usando python e outra na plataforma embarcada 
-pic18f4520(talvez 18f4685) em C.
+## Descrição
+O presente projeto consiste na implementação de um filtro de detecção de bordas em imagens na plataforma embarcada PIC18F4520. O filtro implementado foi o operador Roberts Cross.
 
-Python:
- script "upload" vair abrir um arquivo .pgm(P5), pode ser feito usando módulo numpy e/ou image, extrair os pixels da imagem
- carregada e mandá-los serialmente para uma porta USB do pc usando o módulo pySerial. Na porta USB haverá um adaptador 
- serial-usb pl2303 que mandará o sinal na porta USB para o pic.
- 
- script "download" vai fazer o processo inverso do "upload" vai ler a porta USB do pc,guardar as informações que forem recebidas
- serialmente em uma estrutura e salvar os dados em um arquivo de formato .pgm(P5).
- 
-C:
-  rotinas de interrupção UART para ler/enviar dados pela comunicação serial do pic que estarão conectadas ao pc pelo adaptador
-  pl2303. Quando houver envio de dados do pc para o pic, este será notificado e lerá os dados recebidos, depois irá gravar
-  na memória flash e em seguida computar o filtro de Roberts Cross e salvar os novos dados na mesma área da memória flash.
-  Quando o pc requisitar os dados, o pic enviará serialmente os dados e o script "download" em python no pc ficará responsável
-  por montar a imagem.
-  
-Depois será feito um hardware específico conectando cada componente para facilitar o uso do projeto. Os componentes usados serão:
- -1 pic 18f(4520 ou 4685)
- -1 módulo adaptador serial/usb pl2303
- -3 leds (indicador de power e funcionamento do pic; indicador de comunicação entre pic e pc; indicador de processamento do Roberts)
- -(Opcional) 2 botões (1 para computar filtro de Roberts; 1 para limpar flash)
- -A alimentação será fornecida pela própria porta USB do pc (5v).
+O projeto se consiste de duas partes, uma feita no computador usando python e outra na plataforma embarcada PIC18F4520 em C.
+
+Computador/Python: O script em Python envia um comando, serialmente, através da porta USB, para o PIC, iniciando aplicação do filtro na imagem. Os pixels da imagem, logo após a aplicação do filtro, são automaticamente enviados ao computador e armazenados em um array. Quando toda a imagem é recebida o script retorna um arquivo de imagem no formato .pgm P5.
+
+PIC/C: Quando o comando é recebido pelo PIC ele pega um pixel da imagem, que foi previamente armazenada na memória interna do microcontrolador, aplica o filtro de Roberts Cross e envia ao computador. Esse processo é feito com cada pixel da imagem até que todos tenham sido enviados.
+
+## Testes
+### Entrada
+A imagem de teste armazenada no microcontrolador é uma imagem em escala de cinza de 8 bits de profundidade de cor com resolução de 70 x 43(3010 pixels), o tamanho reduzido da imagem se deve a limitação de memória do microcontrolador utilizado neste projeto.
+
+![Antes da aplicação do filtro](https://github.com/lucasmag/deadlock-detection/blob/master/imagens/thumb1.png)
+### Saída
+![Depois da aplicação do filtro](https://github.com/lucasmag/deadlock-detection/blob/master/imagens/thumb1.png)
+
+## Desenvolvido com
+
+* [MPLAB® X Integrated Development Environment (IDE)](https://www.microchip.com/mplab/mplab-x-ide) 
+* [Python 3 IDLE](https://www.python.org/downloads/)
+
+## Autores
+
+* **Lucas Magalhães** - [LucasMag](https://github.com/lucasmag)
+* **Tiago Siqueira** - [TiagoSD22](https://github.com/TiagoSD22)
+
