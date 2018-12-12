@@ -1,32 +1,32 @@
 /*
- *  Sobre este código:
- *  O arquivo main.c configura os registradores e bits de configuração do pic 16f18875 e aqui encontra-se a rotina 
- *  principal da aplicação. O MCU fica a espera de um comando enviado pela porta serial, e executa o algorito de
- *  Roberts Cross para detecção de bordas na imagem armazenada no arquivo image.h. Os valores dos novos pixels são
- *  enviados para a interface serial onde podem ser lidos por um pc através de um adaptador usb/serial(ttl).
+ *  Sobre este cï¿½digo:
+ *  O arquivo main.c configura os registradores e bits de configuraï¿½ï¿½o do pic 16f18875 e aqui encontra-se a rotina 
+ *  principal da aplicaï¿½ï¿½o. O MCU fica a espera de um comando enviado pela porta serial, e executa o algorito de
+ *  Roberts Cross para detecï¿½ï¿½o de bordas na imagem armazenada no arquivo image.h. Os valores dos novos pixels sï¿½o
+ *  enviados para a interface serial onde podem ser lidos por um pc atravï¿½s de um adaptador usb/serial(ttl).
 
- *  Autores : Tiago Dionizio e Lucas Magalhães
+ *  Autores : Tiago Dionizio e Lucas Magalhï¿½es
 
  *  Copyright (C) 2018 Tiago Siqueira Dionizio  <tiagosdionizio@gmail.com>
 
- *  Copyright (C) 2018 Lucas Magalhães de Sousa <lucasmag97@gmail.com> 
+ *  Copyright (C) 2018 Lucas Magalhï¿½es de Sousa <lucasmag97@gmail.com> 
 
- *  Data de Atualização : 20 de Novembro de 2018
+ *  Data de Atualizaï¿½ï¿½o : 20 de Novembro de 2018
 
  *  Modo de uso:
- *  A aplicação é controlada por comandos enviados para a entrada serial EUSART (RX - RC7, TX - RC6) do MCU, essas 
- *  entradas podem ser enviadas por um script em python usando o módulo pySerial, por meio desse script é possível
- *  ordenar a execução do algoritmo de Roberts e gerar a imagem resultante com os pixels calculados e enviados pelo
+ *  A aplicaï¿½ï¿½o ï¿½ controlada por comandos enviados para a entrada serial EUSART (RX - RC7, TX - RC6) do MCU, essas 
+ *  entradas podem ser enviadas por um script em python usando o mï¿½dulo pySerial, por meio desse script ï¿½ possï¿½vel
+ *  ordenar a execuï¿½ï¿½o do algoritmo de Roberts e gerar a imagem resultante com os pixels calculados e enviados pelo
  *  MCU. 
 
- *  Restrição de uso:
- *  Necessita-se de um interpretador python ( >= 2.7) instalado na máquina que se comunicará com a aplicação,
- *  bem como o módulo pySerial. Além disso, é necessário um adaptador usb/serial(ttl), como o pl2303, de modo que 
- *  que possa haver um canal de comunicação entre o computador e a aplicação embarcada. A imagem gerada é em formato
- *  .pgm binário (P5).
+ *  Restriï¿½ï¿½o de uso:
+ *  Necessita-se de um interpretador python ( >= 2.7) instalado na mï¿½quina que se comunicarï¿½ com a aplicaï¿½ï¿½o,
+ *  bem como o mï¿½dulo pySerial. Alï¿½m disso, ï¿½ necessï¿½rio um adaptador usb/serial(ttl), como o pl2303, de modo que 
+ *  que possa haver um canal de comunicaï¿½ï¿½o entre o computador e a aplicaï¿½ï¿½o embarcada. A imagem gerada ï¿½ em formato
+ *  .pgm binï¿½rio (P5).
 
- *  Referência para o algoritmo: 
- *  MARQUES FILHO, Ogê; VIEIRA NETO, Hugo. Processamento Digital de Imagens, Rio de Janeiro: Brasport, 1999, pg: 97.
+ *  Referï¿½ncia para o algoritmo: 
+ *  MARQUES FILHO, Ogï¿½; VIEIRA NETO, Hugo. Processamento Digital de Imagens, Rio de Janeiro: Brasport, 1999, pg: 97.
 */
 
 
@@ -72,15 +72,17 @@
 #include "uart.h"
 
 /*
- * LEDs para indicar,respectivamente, que está havendo comunicação de dados entre o MCU e o computador e
- * que o filtro de Roberts está sendo processado pelo MCU.
+ * LEDs para indicar,respectivamente, que estï¿½ havendo comunicaï¿½ï¿½o de dados entre o MCU e o computador e
+ * que o filtro de Roberts estï¿½ sendo processado pelo MCU.
  */
 #define comunicacaoLED  LATAbits.LATA7
 #define robertsLED      LATAbits.LATA6
 
+char entrada[10];
+
 /*
- *  Esta função configura alguns registradores do MCU pic16f18875, os pinos dos bloco A e B configurados como saída,
- *  enquanto o bloco C tem o pino RC7 como entrada e os demais como saída.
+ *  Esta funï¿½ï¿½o configura alguns registradores do MCU pic16f18875, os pinos dos bloco A e B configurados como saï¿½da,
+ *  enquanto o bloco C tem o pino RC7 como entrada e os demais como saï¿½da.
  */
 void ConfigurarPIC(void){
     TRISA = 0x00;
@@ -89,67 +91,90 @@ void ConfigurarPIC(void){
 }
 
 /*
- * Esta função é chamada quando o comando GET é recebido na interface serial EUSART e envia os pixels referentes 
- * à imagem de teste armazenada no arquivo image.h, serve para checar se a imagem foi armazenada corretamente.
- */
-void EnviarImagem(void){
-    short i,j;
-    comunicacaoLED = 1;
-    for(i = 1; i < imgALTURA - 1; i++){
-        for(j = 1; j < imgLARGURA - 1; j++){
-            UART_Escrever_Pixel(pixels[i][j]);
-        }
-    }
-    comunicacaoLED = 0;
-}
-
-/*
- * Esta função é chamada quando o comando ROB é recebido na interface serial EUSART e serve para aplicar o 
- * algoritmo de Roberts Cross para todos os pixels da imagem. Foi necessário adaptar o algoritmo, pois a imagem
- * foi armazenada como const, pois, ao contrário, não seria possível armazenar os 3010 pixels referentes a esta.
- * Assim sendo, para cada novo pixel calculado, este valor é imediatamente enviado para a interface serial, para que
+ * Esta funï¿½ï¿½o ï¿½ chamada quando o comando ROB ï¿½ recebido na interface serial EUSART e serve para aplicar o 
+ * algoritmo de Roberts Cross para todos os pixels da imagem. Foi necessï¿½rio adaptar o algoritmo, pois a imagem
+ * foi armazenada como const, pois, ao contrï¿½rio, nï¿½o seria possï¿½vel armazenar os 3010 pixels referentes a esta.
+ * Assim sendo, para cada novo pixel calculado, este valor ï¿½ imediatamente enviado para a interface serial, para que
  * o computador, rodando o script em python possa receber esses valores e gerar a imagem resultante(bordas). 
- * O laço que percorre a imagem inicia da primeira linha e primeira coluna e vai até a penúltima linha e penúltima 
- * coluna, pois a imagem armazenada no arquivo image.h é o resultado da imagem original adicionada de um padding, uma
+ * O laï¿½o que percorre a imagem inicia da primeira linha e primeira coluna e vai atï¿½ a penï¿½ltima linha e penï¿½ltima 
+ * coluna, pois a imagem armazenada no arquivo image.h ï¿½ o resultado da imagem original adicionada de um padding, uma
  * borda feita apenas de pixels com intensidade 0 (preto) colocados ao redor de toda a imagem, 
  * adicionando, assim, duas linhas e duas colunas a mais, que devem ser ignoradas do conjunto de pixels a se aplicar
  * o filtro de Roberts.
  */
 void RobertsCrossSerial(void){
-    robertsLED = 1;
-    short i,j;
+    short i,j,k,l;
+    unsigned char p;
     unsigned char novo_pixel;
-    for(i = 1; i < imgALTURA - 1; i++){
-        for(j = 1; j < imgLARGURA - 1; j++){
-            novo_pixel = RobertsCross(i,j);
+    robertsLED = 1;
+    for(i = 1; i < imgAltura; i++){
+        for(j = 1; j < imgLargura; j++){
+            if (j == 1) {
+                for (l = 0; l < 2; l++) {
+                    UART_Ler_Pixel(&p);
+                    regiaoAtual[0][0] = p;
+                    UART_Ler_Pixel(&p);
+                    regiaoAtual[1][0] = p;
+                }
+            } 
+            else {
+                for (k = 0; k < 2; k++) {
+                    UART_Ler_Pixel(&p);
+                    regiaoAtual[k][1] = p;
+                }
+            }
+            novo_pixel = RobertsCross();
             comunicacaoLED = 1;
             UART_Escrever_Pixel(novo_pixel);
             comunicacaoLED = 0;
+            
+            for(k = 0; k < 2; k++){
+                regiaoAtual[k][0] = regiaoAtual[k][1];
+            }
         }
     }
     robertsLED = 0;
 }
 
+void obterDimensoes(){
+    short i = 0;
+    short j;
+    imgLargura = 0;
+    imgAltura = 0;
+    while(entrada[i] != 'x'){
+        imgLargura = 10 * imgLargura + (entrada[i] - '0');
+        i++;
+    }
+    i++;
+    while(entrada[i] != '\0'){
+        imgAltura = 10 * imgAltura + (entrada[i] - '0'); 
+        i++;
+    }
+}
+
+void iniciarConexao(){
+    UART_Escrever_Texto("ACK");//confirmou conexï¿½o com o PC
+    UART_Ler_Texto(entrada);//espera as dimensï¿½es da imagem a ser processada
+    obterDimensoes();//parseia a mensagem recebida e converte para valores inteiros
+    UART_Escrever_Texto("ACK");//confirma o recebimento e conversï¿½o da resoluï¿½ï¿½o da imagem
+    RobertsCrossSerial();//inicia o filtro de Roberts
+}
+
 /*
  * A rotina principal configura os pinos de I/O e os registradores EUSART do MCU, acende o LED conectado ao pino
  * RA7 para indicar funcionamento da rotina e, em seguida, coloca o MCU em modo de espera de um comando na interface
- * serial EUSART. Caso o comando recebido seja GET, os pixels da imagem no arquivo image.h são enviados serialmente
+ * serial EUSART. Caso o comando recebido seja GET, os pixels da imagem no arquivo image.h sï¿½o enviados serialmente
  * para o computador. Caso o comando o seja ROB, o MCU executa o filtro de Roberts Cross.
  */
 int main(void) {
-    char entrada[4];
-    
     ConfigurarPIC();
     UART_iniciar();  
     LATA = 0x10;
     
     while (1) {
         UART_Ler_Texto(entrada);
-        if(strcmp(entrada,"GET") == 0){
-            EnviarImagem();
-        }
-        else if(strcmp(entrada,"ROB") == 0){
-            RobertsCrossSerial();
+        if(strcmp(entrada,"SYN") == 0){ 
+            iniciarConexao();
         }
     }
     

@@ -23,9 +23,9 @@ void UART_iniciar(){
     ANSELCbits.ANSC6 = 0;   //Desativa função analógica no pino RC6
     RC6PPS = 0x10;          //Configura pino RC6 como TX
     RXPPSbits.RXPPS = 0x17; //Configura pino RC7 como RX
-    TX1STAbits.BRGH = 0;    //Necessário para configurar o baud rate da EUSART
+    TX1STAbits.BRGH = 1;    //Necessário para configurar o baud rate da EUSART
     BAUDCON1bits.BRG16 = 0; //Configura registrado BAUDCON1 como 8 bits
-    SPBRG = 51;             //Configura baud rate para 9600bps
+    SPBRG = 16;              //Configura baud rate para 115200bps
     RC1STAbits.SPEN = 1;    //Habilita EUSART
     RC1STAbits.CREN = 1;    //Habilita recebimento EUSART (RX)
     TX1STAbits.TXEN = 1;    //Habilita transmissão EUSART (TX)
@@ -36,6 +36,11 @@ void UART_iniciar(){
 char UART_Ler(){
     while(!RCIF);
     return RCREG;
+}
+
+void UART_Ler_Pixel(unsigned char* p){
+    while(!RCIF);
+    *p = (unsigned char)RCREG;
 }
 
 /*
@@ -80,4 +85,3 @@ void UART_Escrever_Texto(char* texto){
 }
 
 #endif	/* UART_H */
-
